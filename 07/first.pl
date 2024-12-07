@@ -13,7 +13,7 @@ print "File: $file\n";
 my $valid_result_sum = 0;
 my @valid_results;
 
-my $pm = Parallel::ForkManager->new(16);
+my $pm = Parallel::ForkManager->new(32);
 
 sub calculate($$$) {
     my $left = shift;
