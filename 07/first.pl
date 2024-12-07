@@ -6,7 +6,7 @@ use Parallel::ForkManager;
 use File::Temp qw/tempfile/;
 
 my $file;
-(undef, $file) = tempfile('tmpXXXXXX', OPEN=>0);
+(undef, $file) = tempfile('tmpXXXXXX', OPEN=>0, TMPDIR => 1);
 
 print "File: $file\n";
 
@@ -14,6 +14,17 @@ my $valid_result_sum = 0;
 my @valid_results;
 
 my $pm = Parallel::ForkManager->new(16);
+
+sub calculate($$$) {
+    my $left = shift;
+    my $right = shift;
+    my $results_ref = shift;
+
+    my $sum = $left + $right;
+    my $prod = $left * $right;
+    push @$results_ref, $sum;
+    push @$results_ref, $prod;
+}
 
 sub analyze_line($) {
     my $line = shift;
@@ -28,20 +39,14 @@ sub analyze_line($) {
         my @old_results = @loop_results;
 
         @loop_results = ();
+        my ($sum, $prod) = (0,0);
         if ($#old_results >= 0) {
             foreach my $old_result (@old_results) {
-                push @loop_results, $old_result + $numbers[$i+1];
-                push @loop_results, $old_result * $numbers[$i+1];
-                push @loop_results, $old_result + $numbers[$i+1];
-                push @loop_results, $old_result * $numbers[$i+1];
+                calculate($old_result, $numbers[$i+1], \@loop_results);
             }
         } else {
-             my $sum = $numbers[$i] + $numbers[$i+1];
-             my $prod = $numbers[$i] * $numbers[$i+1];
-             push @loop_results, $sum;
-             push @loop_results, $prod;
+            calculate($numbers[$i], $numbers[$i+1], \@loop_results);
         }
-        #print Dumper \@loop_results;
     }
     if ( grep( /^$result$/, @loop_results ) ) {
         print "Valid result: $result\n";
@@ -49,7 +54,6 @@ sub analyze_line($) {
         flock($fh, LOCK_EX) or die "Could not lock '$file' - $!";
         print $fh "$result\n";
         close($fh) or die "Could not write '$file' - $!";
-        #$valid_result_sum += $result;
     }
     return 0;
 }
