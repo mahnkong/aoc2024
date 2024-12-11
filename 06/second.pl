@@ -114,10 +114,7 @@ sub navigate_next($$$$) {
         $direction = $rules->{$direction}->{next};
     }
     print "$coordinates->[0]X$coordinates->[1]\n";
-    if ($store_direction) {
-    } else {
-        $passed{"$coordinates->[0]X$coordinates->[1]"} = undef;
-    }
+    
     my $new = [];
     @$new = $rules->{$direction}->{move}->($coordinates->[0], $coordinates->[1]);
     if ($map->[$new->[0]]->[$new->[1]] ne "#") {
