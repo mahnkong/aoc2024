@@ -113,7 +113,6 @@ sub navigate_next($$$$) {
     if ($map->[$next_i]->[$next_j] eq "#") {
         $direction = $rules->{$direction}->{next};
     }
-    print "$coordinates->[0]X$coordinates->[1]\n";
     
     my $new = [];
     @$new = $rules->{$direction}->{move}->($coordinates->[0], $coordinates->[1]);
