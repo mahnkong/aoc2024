@@ -103,6 +103,7 @@ sub navigate($) {
         return;
     }
     if ($v eq "E") {
+        print "E\n";
         $route->{done} = 1;
         $cheapest = $route->{score} if !$cheapest || $route->{score} < $cheapest;
         return;

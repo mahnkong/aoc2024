@@ -1,7 +1,7 @@
 use strict;
 use bigint;
-use Fcntl ':flock'; # Import LOCK_* constants
 use Data::Dumper;
+use Fcntl ':flock'; # Import LOCK_* constants
 use Parallel::ForkManager;
 use File::Temp qw/tempfile/;
 

@@ -35,3 +35,18 @@ sub coord_key($$) {
     my $j = shift;
     return "${i}x${j}";
 }
+
+sub mark_field($$) {
+    my $map = shift;
+    my $coordinates = shift;
+    my $value = shift;
+
+    $map->[$coordinates->{i}]->[$coordinates->{j}] = $value;
+}
+
+sub field($$) {
+    my $map = shift;
+    my $coordinates = shift;
+
+    return $map->[$coordinates->{i}]->[$coordinates->{j}];
+}
