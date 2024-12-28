@@ -1,19 +1,11 @@
 use strict;
 use bigint;
-use Fcntl ':flock'; # Import LOCK_* constants
+use threads;
+use threads::shared;
 use Data::Dumper;
-use Parallel::ForkManager;
-use File::Temp qw/tempfile/;
 
-my $file;
-(undef, $file) = tempfile('tmpXXXXXX', OPEN=>0, TMPDIR => 1);
-
-print "File: $file\n";
-
-my $valid_result_sum = 0;
-my @valid_results;
-
-my $pm = Parallel::ForkManager->new(32);
+my @valid_results :shared;
+my @threads;
 
 sub calculate($$$) {
     my $left = shift;
@@ -52,31 +44,26 @@ sub analyze_line($) {
     }
     if ( grep( /^$result$/, @loop_results ) ) {
         print "Valid result: $result\n";
-        open(my $fh, '>>', $file) or die "Could not open '$file' - $!";
-        flock($fh, LOCK_EX) or die "Could not lock '$file' - $!";
-        print $fh "$result\n";
-        close($fh) or die "Could not write '$file' - $!";
+        push @valid_results, $result;
     }
     return 0;
 }
 
-DATA_LOOP:
 for my $line (<DATA>) {
     chomp $line;
-    my $pid = $pm->start and next DATA_LOOP;
-    analyze_line($line);
-    $pm->finish; # Terminates the child process
+    push @threads, threads->create(sub { analyze_line($line) });
 }
 
-$pm->wait_all_children;
-
-open my $fh, $file or die "Could not open $file: $!";
-while( my $line = <$fh>)  {
-    chomp($line);
-    $valid_result_sum += $line;
+for my $thread (@threads) {
+    $thread->join();
 }
-close $fh;
-print "Valit result sum: $valid_result_sum\n";
+
+my $valid_results_sum = 0;
+foreach my $valid_result (@valid_results) {
+    $valid_results_sum += $valid_result;
+}
+
+print "Valit result sum: $valid_results_sum\n";
 
 __DATA__
 781114: 614 6 2 2 2 53
