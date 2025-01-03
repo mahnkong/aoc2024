@@ -1,4 +1,4 @@
-package aoc::essentials;
+package AOC::Essentials;
 
 sub get_input($) {
     my $file = shift;
