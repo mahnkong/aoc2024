@@ -2,32 +2,23 @@ BEGIN {
     push @INC, "../lib";
 }
 use strict;
-use aoc::essentials;
-use aoc::coordinates;
+use AOC::Essentials;
+use AOC::2D::Field;
+use AOC::2D::Map;
 
-my @input = aoc::essentials::get_input(@ARGV ? "input.txt" : "example.txt");
+my @input = AOC::Essentials::get_input(@ARGV ? "input.txt" : "example.txt");
 
-my $i = 0;
 my %trailheads;
+my $map = new AOC::2D::Map();
+$map->initialize(@input);
 
-foreach my $line (@input) {
-    chomp $line;
-    my $j = 0;
-    $aoc::coordinates::map->[$i] = [];
-    foreach my $p (split //, $line) {
-        $aoc::coordinates::map->[$i]->[$j] = $p;
-        $j += 1;
-    }
-    $i += 1;
-    $aoc::coordinates::max_j = $j-1 unless $aoc::coordinates::max_j;
-}
-$aoc::coordinates::max_i = $i-1;
+for (my $i = 0; $i <= $map->max_i(); $i++) {
+    for (my $j = 0; $j <= $map->max_j(); $j++) {
+        my $field = $map->field($i, $j);
 
-for (my $i = 0; $i <= $#{$aoc::coordinates::map}; $i++) {
-    for (my $j = 0; $j <= $#{$aoc::coordinates::map->[$i]}; $j++) {
-        if ($aoc::coordinates::map->[$i]->[$j] == 0) {
-            $trailheads{aoc::coordinates::coord_key({i => $i, j => $j})} = {};
-            find_route($i, $j, $trailheads{aoc::coordinates::coord_key({i => $i, j => $j})});
+        if ($field->value() == 0) {
+            $trailheads{$field->key()} = {};
+            find_route($field, $trailheads{$field->key()});
         }
     }
 }
@@ -39,23 +30,23 @@ for my $trailhead (keys %trailheads) {
 print "Sum: $trailhead_sum\n";
 
 sub find_route($$) {
-    my $i = shift;
-    my $j = shift;
+    my $field = shift;
     my $current_trailhead = shift;
 
-    my $val = $aoc::coordinates::map->[$i]->[$j];
-    if ($val == 9 && !exists($current_trailhead->{(aoc::coordinates::coord_key({i => $i, j => $j}))})) {
-        $current_trailhead->{aoc::coordinates::coord_key({i => $i, j => $j})} = undef;
+    if ($field->value() == 9 && !exists($current_trailhead->{$field->key()})) {
+        $current_trailhead->{$field->key()} = undef;
         return;
     }
-    foreach my $k ($i-1, $i+1) {
-        if (aoc::coordinates::cordinates_valid({i => $k, j => $j}) && $aoc::coordinates::map->[$k]->[$j] == $val + 1) {
-            find_route($k, $j, $current_trailhead);
+    foreach my $k ($field->i()-1, $field->i()+1) {
+        my $new_field = $map->field($k, $field->j());
+        if ($new_field && $new_field->value() == $field->value() + 1) {
+            find_route($new_field, $current_trailhead);
         }
     }
-    foreach my $k ($j-1, $j+1) {
-        if (aoc::coordinates::cordinates_valid({i => $i, j => $k}) && $aoc::coordinates::map->[$i]->[$k] == $val + 1) {
-            find_route($i, $k, $current_trailhead);
+    foreach my $k ($field->j()-1, $field->j()+1) {
+        my $new_field = $map->field($field->i(), $k);
+        if ($new_field && $new_field->value() == $field->value() + 1) {
+            find_route($new_field, $current_trailhead);
         }
     }
 }
