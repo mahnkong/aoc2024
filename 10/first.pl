@@ -9,8 +9,7 @@ use AOC::2D::Map;
 my @input = AOC::Essentials::get_input(@ARGV ? "input.txt" : "example.txt");
 
 my %trailheads;
-my $map = new AOC::2D::Map();
-$map->initialize(@input);
+my $map = new AOC::2D::Map(input => \@input);
 
 for (my $i = 0; $i <= $map->max_i(); $i++) {
     for (my $j = 0; $j <= $map->max_j(); $j++) {

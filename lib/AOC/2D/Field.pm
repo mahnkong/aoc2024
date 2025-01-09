@@ -1,48 +1,25 @@
-package AOC::2D::Field;
 use Carp;
 use strict;
+use v5.38;
+use experimental 'class';
 
-sub new {
-    my $class = shift;
-    my %opts  = @_;
-    my $self = {};
+class AOC::2D::Field {
+    field $i :param;
+    field $j :param;
+    field $value :param;
 
-    foreach my $k ("i", "j", "value") {
-        croak "option '$k' must be provided!" unless exists $opts{$k};
-        $self->{$k} = $opts{$k};
-    };
+    method i() { return $i }
 
-    bless $self, $class;
-    return $self;
+    method j() { return $j }
 
-}
+    method value() { return $value; }
 
-sub i($) {
-    my $self = shift;
-    return $self->{i};
-}
+    method key() { return "${i}x${j}"; }
 
-sub j($) {
-    my $self = shift;
-    return $self->{j};
-}
-
-sub set_coordinates($$$) {
-   my $self = shift;
-   my $i = shift;
-   my $j = shift;
-   $self->{i} = $i;
-   $self->{j} = $i;
-}
-
-sub value($) {
-    my $self = shift;
-    return $self->{value};
-}
-
-sub key($) {
-    my $self = shift;
-    return "$self->{i}x$self->{j}";
+    method set_coordinates($new_i, $new_j) {
+       $i = $new_i;
+       $j = $new_j;
+    }
 }
 
 1;

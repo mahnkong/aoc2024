@@ -2,15 +2,14 @@ BEGIN {
     push @INC, "../lib";
 }
 use strict;
+use warnings;
 use AOC::Essentials;
-use AOC::2D::Field;
 use AOC::2D::Map;
 
 my @input = AOC::Essentials::get_input(@ARGV ? "input.txt" : "example.txt");
 
 my %trailheads;
-my $map = new AOC::2D::Map();
-$map->initialize(@input);
+my $map = AOC::2D::Map->new(input => \@input);
 
 for (my $i = 0; $i <= $map->max_i(); $i++) {
     for (my $j = 0; $j <= $map->max_j(); $j++) {

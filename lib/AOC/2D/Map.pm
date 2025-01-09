@@ -1,60 +1,47 @@
-package AOC::2D::Map;
-require AOC::2D::Field; import AOC::2D::Field;
 use strict;
+use v5.38;
+use experimental 'class';
+use AOC::2D::Field;
 
-sub new {
-    my $class = shift;
-    my %opts  = @_;
-    my $self = {
-        map => [],
-        max_i => 0,
-        max_j => 0
-    };
+class AOC::2D::Map {
 
-    bless $self, $class;
-    return $self;
-}
+    field $map = [];
+    field $max_i = 0;
+    field $max_j = 0;
+    field $input :param;
 
-sub initialize($@) {
-    my $self  = shift;
-    my @input = @_;
-
-    my $i = 0;
-    foreach my $line (@input) {
-        chomp $line;
-        my $j = 0;
-        $self->{map}->[$i] = [];
-        foreach my $v (split //, $line) {
-            $self->{map}->[$i]->[$j] = $v;
-            $j += 1;
+    ADJUST {
+        my $i = 0;
+        foreach my $line (@$input) {
+            chomp $line;
+            my $j = 0;
+            $map->[$i] = [];
+            foreach my $v (split //, $line) {
+                $map->[$i]->[$j] = $v;
+                $j += 1;
+            }
+            $i += 1;
+            $max_j = $j-1 unless $max_j;
         }
-        $i += 1;
-        $self->{max_j} = $j-1 unless $self->{max_j};
+        $max_i = $i-1;
     }
-    $self->{max_i} = $i-1;
-}
 
-sub max_i($) {
-    my $self = shift;
-    return $self->{max_i};
-}
-
-sub max_j($) {
-    my $self = shift;
-    return $self->{max_j};
-}
-
-sub field($$$) {
-    my $self = shift;
-    my $i = shift;
-    my $j = shift;
-
-    return undef if $i < 0 || $i > $self->{max_i};
-    return undef if $j < 0 || $j > $self->{max_j};
-    if (exists($self->{map}->[$i]->[$j])) {
-        return new AOC::2D::Field(i => $i, j => $j, value => $self->{map}->[$i]->[$j]);
+    method max_i() {
+        return $max_i;
     }
-    return undef;
+
+    method max_j() {
+        return $max_j;
+    }
+
+    method field($i, $j) {
+        return undef if $i < 0 || $i > $max_i;
+        return undef if $j < 0 || $j > $max_j;
+        if (exists($map->[$i]->[$j])) {
+            return AOC::2D::Field->new(i => $i, j => $j, value => $map->[$i]->[$j]);
+        }
+        return undef;
+    }
 }
 
 1;
