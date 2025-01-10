@@ -3,7 +3,6 @@ BEGIN {
 }
 use strict;
 use AOC::Essentials;
-use AOC::2D::Field;
 use AOC::2D::Map;
 
 my @input = AOC::Essentials::get_input(@ARGV ? "input.txt" : "example.txt");

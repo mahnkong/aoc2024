@@ -20,6 +20,14 @@ class AOC::2D::Field {
        $i = $new_i;
        $j = $new_j;
     }
+
+    method dump() {
+        return __PACKAGE__ . ": {i => $i, j => $j, value => $value}"
+    }
+
+    method clone() {
+        return $self->new(i => $i, j => $j, value => $value);
+    }
 }
 
 1;
